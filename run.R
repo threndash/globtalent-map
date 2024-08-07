@@ -18,7 +18,7 @@ registerPlugin <- function(map, plugin) {
   map
 }
 
-file <- "https://raw.githubusercontent.com/threndash/logo/master/"
+file <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pins/"
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 world_large <- ne_countries(scale = "large", returnclass = "sf")
