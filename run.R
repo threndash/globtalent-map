@@ -18,7 +18,7 @@ registerPlugin <- function(map, plugin) {
   map
 }
 
-file <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pins/"
+pins_path <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pins/"
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 world_large <- ne_countries(scale = "large", returnclass = "sf")
@@ -75,7 +75,7 @@ dt$ang[dt$n_programs==4 & dt$ord_program==2] <- 90
 dt$ang[dt$n_programs==4 & dt$ord_program==3] <- 180
 dt$ang[dt$n_programs==4 & dt$ord_program==4] <- 270
 
-dt$file <- paste0(file,tolower(dt$program),".svg")
+dt$file <- paste0(pins_path,tolower(dt$program),".svg")
 
 setdiff(dt$country,centroids_df$admin)
 
@@ -103,24 +103,24 @@ mytext_markers <- paste(
   sep="") %>%
   lapply(htmltools::HTML)
 
-legend_html <- "
+legend_html <- paste0("
 <div style='display: flex; align-items: center;'>
-    <img src='https://raw.githubusercontent.com/threndash/logo/master/star.svg' width='10px' height='13.3px'>
+    <img src='",pins_path,"star.svg' width='10px' height='13.3px'>
     <span style='margin-left: 5px;'>STAR</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
-    <img src='https://raw.githubusercontent.com/threndash/logo/master/nations.svg' width='10px' height='13.3px'>
+    <img src='",pins_path,"nations.svg' width='10px' height='13.3px'>
     <span style='margin-left: 5px;'>NATIONS</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
-    <img src='https://raw.githubusercontent.com/threndash/logo/master/big.svg' width='10px' height='13.3px'>
+    <img src='",pins_path,"big.svg' width='10px' height='13.3px'>
     <span style='margin-left: 5px;'>BIG</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
-    <img src='https://raw.githubusercontent.com/threndash/logo/master/excl.svg' width='10px' height='13.3px'>
+    <img src='",pins_path,"excl.svg' width='10px' height='13.3px'>
     <span style='margin-left: 5px;'>EXCL</span>
 </div>
-"
+")
 
 lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>%
   # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
