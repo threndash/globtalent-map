@@ -38,7 +38,7 @@ centroids_df <- data.frame(
   latitude = centroid_coords[,2]
 )
 
-dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Web images/map/Taras_input_data.xlsx")
+dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Web images/map/input_data.xlsx")
 names(dt) <- paste0("country.",gsub("[^A-Z]","",names(dt)))
 dt <- reshape(as.data.frame(dt),v.names = "country",varying = grep("^country",names(dt),value = T),timevar = "program",
               times = gsub("country\\.","",grep("^country",names(dt),value = T)),direction = "long")
@@ -132,7 +132,7 @@ lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>
     fillOpacity = 1,
     stroke = FALSE
   ) %>%
-  addPolygons(data = world, color = "#404040", fillColor = "#ffffff", weight = 1, fillOpacity = 0.7) %>%
+  addPolygons(data = world, color = "#404040", fillColor = "#ffffff", weight = 1, fillOpacity = 1) %>%
   addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#cacaca",  weight = 1, fillOpacity = 1,
               label = mytext,
               labelOptions = labelOptions( 
