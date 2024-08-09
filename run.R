@@ -128,12 +128,12 @@ lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>
   registerPlugin( plugin = rotatedMarker ) %>%
   addPolygons(
     data = ocean_polygon, 
-    fillColor = "#8AA99F", # Ocean color
+    fillColor = "#89BCBC", # Ocean color
     fillOpacity = 1,
     stroke = FALSE
   ) %>%
-  addPolygons(data = world, color = "#404040", fillColor = "#ffffff", weight = 1, fillOpacity = 1) %>%
-  addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#cacaca",  weight = 1, fillOpacity = 1,
+  addPolygons(data = world, color = "#404040", fillColor = "#f2f0e9", weight = 1, fillOpacity = 1) %>%
+  addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#CFCFCF",  weight = 1, fillOpacity = 1,
               label = mytext,
               labelOptions = labelOptions( 
                 style = list("font-weight" = "normal", padding = "3px 8px"), 
