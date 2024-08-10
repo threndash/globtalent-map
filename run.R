@@ -124,7 +124,7 @@ legend_html <- paste0("
 
 lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>%
   # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
-  setView( lat=20, lng=20 , zoom=3) %>%
+  setView( lat=20, lng=20 , zoom=2.5) %>%
   registerPlugin( plugin = rotatedMarker ) %>%
   addPolygons(
     data = ocean_polygon, 
