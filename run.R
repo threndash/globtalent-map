@@ -38,7 +38,7 @@ centroids_df <- data.frame(
   latitude = centroid_coords[,2]
 )
 
-dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Web images/map/input_data.xlsx")
+dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Web/globtalent-map/input_data.xlsx")
 names(dt) <- paste0("country.",gsub("[^A-Z]","",names(dt)))
 dt <- reshape(as.data.frame(dt),v.names = "country",varying = grep("^country",names(dt),value = T),timevar = "program",
               times = gsub("country\\.","",grep("^country",names(dt),value = T)),direction = "long")
@@ -122,7 +122,7 @@ legend_html <- paste0("
 </div>
 ")
 
-lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>%
+lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 2.8) ) %>%
   # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
   setView( lat=20, lng=20 , zoom=2.5) %>%
   registerPlugin( plugin = rotatedMarker ) %>%
