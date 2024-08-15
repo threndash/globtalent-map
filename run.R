@@ -91,14 +91,17 @@ leafIcons <- icons(
   iconWidth = 10*0.75, iconHeight = 10
 )
 
-mytext <- paste(
-  "Country: ", selected_countries_data$admin,"<br/>",
-  "Programs: ", selected_countries_data$all_programs,
-  sep="") %>%
-  lapply(htmltools::HTML)
+selected_countries_data$admin_label <- selected_countries_data$admin
+selected_countries_data$admin_label[selected_countries_data$admin_label=="Palestine"] <- "West Bank and Gaza"
 
 dt$country_label <- dt$country
 dt$country_label[dt$country_label=="Palestine"] <- "West Bank and Gaza"
+
+mytext <- paste(
+  "Country: ", selected_countries_data$admin_label,"<br/>",
+  "Programs: ", selected_countries_data$all_programs,
+  sep="") %>%
+  lapply(htmltools::HTML)
 
 mytext_markers <- paste(
   "Country: ", dt$country_label,"<br/>",
