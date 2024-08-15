@@ -97,8 +97,11 @@ mytext <- paste(
   sep="") %>%
   lapply(htmltools::HTML)
 
+dt$country_label <- dt$country
+dt$country_label[dt$country_label=="Palestine"] <- "West Bank and Gaza"
+
 mytext_markers <- paste(
-  "Country: ", dt$country,"<br/>",
+  "Country: ", dt$country_label,"<br/>",
   "Programs: ", dt$all_programs,
   sep="") %>%
   lapply(htmltools::HTML)
@@ -122,9 +125,9 @@ legend_html <- paste0("
 </div>
 ")
 
-lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 2.8) ) %>%
+lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 0.1) ) %>%
   # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
-  setView( lat=20, lng=20 , zoom=2.5) %>%
+  setView( lat=20, lng=20 , zoom=2.8) %>%
   registerPlugin( plugin = rotatedMarker ) %>%
   addPolygons(
     data = ocean_polygon, 
