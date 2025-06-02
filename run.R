@@ -6,6 +6,11 @@ library(sf)
 library(data.table)
 library(rmapshaper)
 
+<<<<<<< HEAD
+=======
+setwd("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Globtalent Web/globtalent-map")
+
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
 rotatedMarker <- htmlDependency(
   "Leaflet.rotatedMarker",
   "0.1.2",
@@ -18,7 +23,11 @@ registerPlugin <- function(map, plugin) {
   map
 }
 
+<<<<<<< HEAD
 file <- "https://raw.githubusercontent.com/threndash/logo/master/"
+=======
+pins_path <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pins/"
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 world_large <- ne_countries(scale = "large", returnclass = "sf")
@@ -38,7 +47,11 @@ centroids_df <- data.frame(
   latitude = centroid_coords[,2]
 )
 
+<<<<<<< HEAD
 dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Globtalent Web/globtalent-map/input_data.xlsx")
+=======
+dt <- readxl::read_excel("input_data.xlsx")
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
 names(dt) <- paste0("country.",gsub("[^A-Z]","",names(dt)))
 dt <- reshape(as.data.frame(dt),v.names = "country",varying = grep("^country",names(dt),value = T),timevar = "program",
               times = gsub("country\\.","",grep("^country",names(dt),value = T)),direction = "long")
@@ -76,7 +89,11 @@ dt$ang[dt$n_programs==4 & dt$ord_program==2] <- 90
 dt$ang[dt$n_programs==4 & dt$ord_program==3] <- 180
 dt$ang[dt$n_programs==4 & dt$ord_program==4] <- 270
 
+<<<<<<< HEAD
 dt$file <- paste0(file,tolower(dt$program),".svg")
+=======
+dt$file <- paste0(pins_path,tolower(dt$program),".svg")
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
 
 setdiff(dt$country,centroids_df$admin)
 
@@ -92,18 +109,34 @@ leafIcons <- icons(
   iconWidth = 10*0.75, iconHeight = 10
 )
 
+<<<<<<< HEAD
 mytext <- paste(
   "Country: ", selected_countries_data$admin,"<br/>",
+=======
+selected_countries_data$admin_label <- selected_countries_data$admin
+selected_countries_data$admin_label[selected_countries_data$admin_label=="Palestine"] <- "West Bank and Gaza"
+
+dt$country_label <- dt$country
+dt$country_label[dt$country_label=="Palestine"] <- "West Bank and Gaza"
+
+mytext <- paste(
+  "Country: ", selected_countries_data$admin_label,"<br/>",
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
   "Programs: ", selected_countries_data$all_programs,
   sep="") %>%
   lapply(htmltools::HTML)
 
 mytext_markers <- paste(
+<<<<<<< HEAD
   "Country: ", dt$country,"<br/>",
+=======
+  "Country: ", dt$country_label,"<br/>",
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
   "Programs: ", dt$all_programs,
   sep="") %>%
   lapply(htmltools::HTML)
 
+<<<<<<< HEAD
 legend_html <- "
 <div style='display: flex; align-items: center;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/star.svg' width='10px' height='13.3px'>
@@ -135,6 +168,39 @@ lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE) ) %>
   ) %>%
   addPolygons(data = world, color = "#404040", fillColor = "#ffffff", weight = 1, fillOpacity = 0.7) %>%
   addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#cacaca",  weight = 1, fillOpacity = 1,
+=======
+legend_html <- paste0("
+<div style='display: flex; align-items: center;'>
+    <img src='",pins_path,"star.svg' width='10px' height='13.3px'>
+    <span style='margin-left: 5px;'>STAR</span>
+</div>
+<div style='display: flex; align-items: center; margin-top: 5px;'>
+    <img src='",pins_path,"nations.svg' width='10px' height='13.3px'>
+    <span style='margin-left: 5px;'>NATIONS</span>
+</div>
+<div style='display: flex; align-items: center; margin-top: 5px;'>
+    <img src='",pins_path,"big.svg' width='10px' height='13.3px'>
+    <span style='margin-left: 5px;'>BIG</span>
+</div>
+<div style='display: flex; align-items: center; margin-top: 5px;'>
+    <img src='",pins_path,"excl.svg' width='10px' height='13.3px'>
+    <span style='margin-left: 5px;'>EXCL</span>
+</div>
+")
+
+lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 0.1) ) %>%
+  # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
+  setView( lat=20, lng=20 , zoom=2.8) %>%
+  registerPlugin( plugin = rotatedMarker ) %>%
+  addPolygons(
+    data = ocean_polygon, 
+    fillColor = "#89BCBC", # Ocean color
+    fillOpacity = 1,
+    stroke = FALSE
+  ) %>%
+  addPolygons(data = world, color = "#404040", fillColor = "#f2f0e9", weight = 1, fillOpacity = 1) %>%
+  addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#CFCFCF",  weight = 1, fillOpacity = 1,
+>>>>>>> 2d88f61daedc3b27506a66caad7ddc17ad14f54c
               label = mytext,
               labelOptions = labelOptions( 
                 style = list("font-weight" = "normal", padding = "3px 8px"), 
