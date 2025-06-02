@@ -6,8 +6,6 @@ library(sf)
 library(data.table)
 library(rmapshaper)
 
-setwd("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Globtalent Web/globtalent-map")
-
 rotatedMarker <- htmlDependency(
   "Leaflet.rotatedMarker",
   "0.1.2",
@@ -41,7 +39,6 @@ centroids_df <- data.frame(
   latitude = centroid_coords[,2]
 )
 
-dt <- readxl::read_excel("~/Library/CloudStorage/GoogleDrive-hrendash@globtalent.org/My Drive/Globtalent Web/globtalent-map/input_data.xlsx")
 dt <- readxl::read_excel("input_data.xlsx")
 names(dt) <- paste0("country.",gsub("[^A-Z]","",names(dt)))
 dt <- reshape(as.data.frame(dt),v.names = "country",varying = grep("^country",names(dt),value = T),timevar = "program",
@@ -185,4 +182,4 @@ lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoom
   # addLegend( colors = c("#1f77b4", "#ff7f0e", "#2ca02c","#d62728"), 
   #            labels = c("STAR", "NATIONS", "BIG", "EXCL"),
   #            opacity=0.9, title = "Programs", position = "topright" )
-saveWidget(lf, file = "index.html")
+saveWidget(lf, file = "~/Downloads/globtalent-map/index.html")
