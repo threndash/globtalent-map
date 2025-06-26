@@ -5,12 +5,22 @@ library(rnaturalearth)
 library(sf)
 library(data.table)
 library(rmapshaper)
+library(lwgeom)
 
 rotatedMarker <- htmlDependency(
   "Leaflet.rotatedMarker",
   "0.1.2",
   src = normalizePath("."),
   script = "leaflet.rotatedMarker.js"
+)
+
+
+robinson_crs <- leafletCRS(
+  crsClass = "L.Proj.CRS",
+  code = "ESRI:54030",
+  proj4def = "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+  resolutions = 2^(16:7),
+  origin = c(-180, 90)
 )
 
 registerPlugin <- function(map, plugin) {
@@ -21,20 +31,22 @@ registerPlugin <- function(map, plugin) {
 file <- "https://raw.githubusercontent.com/threndash/logo/master/"
 pins_path <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pins/"
 
-world <- ne_countries(scale = "medium", returnclass = "sf")
-world_large <- ne_countries(scale = "large", returnclass = "sf")
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# world_large <- ne_countries(scale = "large", returnclass = "sf")
 
-ocean_polygon <- st_polygon(list(rbind(
-  c(-180, -90), c(180, -90), c(180, 90), c(-180, 90), c(-180, -90)
-))) %>% 
-  st_sfc(crs = 4326) %>% 
-  st_sf(data.frame(id = 1, geometry = .))
+gb_file <- "geoBoundariesCGAZ_ADM0.geojson"
+url <- paste0("https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/",gb_file)
+# download.file(url,gb_file)
+world_raw <- st_read(gb_file)
+world_valid <- st_make_valid(world_raw)
+world <- ms_simplify(world_raw, keep = 0.025, keep_shapes = TRUE)
+# unlink(gb_file)
 
-world_centroids <- st_centroid(world)
+world_centroids <- st_centroid(world_valid)
 centroid_coords <- st_coordinates(world_centroids)
 
 centroids_df <- data.frame(
-  admin = world$admin,
+  admin = world$shapeName,
   longitude = centroid_coords[,1],
   latitude = centroid_coords[,2]
 )
@@ -80,21 +92,33 @@ dt$ang[dt$n_programs==4 & dt$ord_program==4] <- 270
 dt$file <- paste0(file,tolower(dt$program),".svg")
 dt$file <- paste0(pins_path,tolower(dt$program),".svg")
 
+centroids_df$admin[centroids_df$admin=="Bosnia & Herzegovina"] <- "Bosnia and Herzegovina"
+centroids_df$admin[centroids_df$admin=="Samoa"] <- "American Samoa"
+centroids_df$admin[centroids_df$admin=="Congo, Dem Rep of the"] <- "Democratic Republic of the Congo"
+centroids_df$admin[centroids_df$admin=="Cote d'Ivoire"] <- "Ivory Coast"
+centroids_df$admin[centroids_df$admin=="Macedonia"] <- "North Macedonia"
+centroids_df$admin[centroids_df$admin %in% c("Gaza Strip","West Bank")] <- "Palestine"
+centroids_df$admin[centroids_df$admin == "Serbia"] <- "Republic of Serbia"
+centroids_df$admin[centroids_df$admin == "Tanzania"] <- "United Republic of Tanzania"
+centroids_df$admin[centroids_df$admin == "Swaziland"] <- "eSwatini"
+
 setdiff(dt$country,centroids_df$admin)
 
 dt <- merge(dt,centroids_df,by.x="country",by.y="admin")
 
-selected_countries_data <- world_large[world_large$admin %in% dt$country, ]
+selected_countries_data <- world[world$shapeName %in% dt$country, ]
+other_countries_data <- world[!(world$shapeName %in% dt$country), ]
+other_countries_data <- other_countries_data[!(other_countries_data$shapeName %in% c("Dragonja","Vatican City","Liancourt Rocks","Spratly Is","Fiji","Antarctica")),]
 # selected_countries_highres <- ms_simplify(selected_countries_data, keep = 0.99, keep_shapes = TRUE)
 cols <- c("country", "all_programs")
-selected_countries_data <- merge(selected_countries_data,unique(dt[,..cols]),by.x="admin",by.y="country")
+selected_countries_data <- merge(selected_countries_data,unique(dt[,..cols]),by.x="shapeName",by.y="country")
 
 leafIcons <- icons(
   dt$file,
   iconWidth = 10*0.75, iconHeight = 10
 )
 
-selected_countries_data$admin_label <- selected_countries_data$admin
+selected_countries_data$admin_label <- selected_countries_data$shapeName
 selected_countries_data$admin_label[selected_countries_data$admin_label=="Palestine"] <- "West Bank and Gaza"
 
 dt$country_label <- dt$country
@@ -150,17 +174,31 @@ legend_html <- paste0("
 </div>
 ")
 
-lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 0.1) ) %>%
+ocean_polygon <- st_polygon(list(rbind(
+  c(-180, -90), c(180, -90), c(180, 90), c(-180, 90), c(-180, -90)
+))) %>% 
+  st_sfc(crs = 4326) %>% 
+  st_sf(data.frame(id = 1, geometry = .))
+
+lf <- leaflet( data = dt,
+               options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 0.1,
+                                        crs = robinson_crs) ) %>%
   # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
-  setView( lat=20, lng=20 , zoom=2.8) %>%
-  registerPlugin( plugin = rotatedMarker ) %>%
-  addPolygons(
-    data = ocean_polygon, 
-    fillColor = "#89BCBC", # Ocean color
-    fillOpacity = 1,
-    stroke = FALSE
+  htmlwidgets::onRender(
+    "function(el, x) {
+        var map = this;
+        map.getContainer().style.background = '#89BCBC';  // Light grey background
+        }"
   ) %>%
-  addPolygons(data = world, color = "#404040", fillColor = "#f2f0e9", weight = 1, fillOpacity = 1) %>%
+  setView( lat=20, lng=20 , zoom=1.25) %>%
+  registerPlugin( plugin = rotatedMarker ) %>%
+  # addPolygons(
+  #   data = ocean_polygon, 
+  #   fillColor = "#89BCBC", # Ocean color
+  #   fillOpacity = 1,
+  #   stroke = FALSE
+  # ) %>%
+  addPolygons(data = other_countries_data, color = "#404040", fillColor = "#f2f0e9", weight = 1, fillOpacity = 1) %>%
   addPolygons(data = selected_countries_data, color = "#404040", fillColor = "#CFCFCF",  weight = 1, fillOpacity = 1,
               label = mytext,
               labelOptions = labelOptions( 
@@ -173,13 +211,14 @@ lf <- leaflet( data = dt, options = leafletOptions(scrollWheelZoom = FALSE, zoom
               , icon = leafIcons
               , options = markerOptions( rotationAngle = ~ang )
               , label = mytext_markers,
-              labelOptions = labelOptions( 
-                style = list("font-weight" = "normal", padding = "3px 8px"), 
-                textsize = "13px", 
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "13px",
                 direction = "auto"
               )) %>%
   addControl(html = legend_html, position = "topright")
   # addLegend( colors = c("#1f77b4", "#ff7f0e", "#2ca02c","#d62728"), 
   #            labels = c("STAR", "NATIONS", "BIG", "EXCL"),
   #            opacity=0.9, title = "Programs", position = "topright" )
-saveWidget(lf, file = "~/Downloads/globtalent-map/index.html")
+# lf
+saveWidget(lf, file = "index.html")
