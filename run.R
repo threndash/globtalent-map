@@ -183,14 +183,13 @@ ocean_polygon <- st_polygon(list(rbind(
 lf <- leaflet( data = dt,
                options = leafletOptions(scrollWheelZoom = FALSE, zoomSnap = 0.1,
                                         crs = robinson_crs) ) %>%
-  # addProviderTiles( providers$Thunderforest.OpenCycleMap ) %>%
   htmlwidgets::onRender(
     "function(el, x) {
         var map = this;
         map.getContainer().style.background = '#89BCBC';  // Light grey background
         }"
   ) %>%
-  setView( lat=20, lng=20 , zoom=1.25) %>%
+  setView( lat=10, lng=20 , zoom=1.25) %>%
   registerPlugin( plugin = rotatedMarker ) %>%
   # addPolygons(
   #   data = ocean_polygon, 
