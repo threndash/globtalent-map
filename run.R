@@ -6,6 +6,7 @@ library(sf)
 library(data.table)
 library(rmapshaper)
 library(lwgeom)
+library(plyr)
 
 rotatedMarker <- htmlDependency(
   "Leaflet.rotatedMarker",
@@ -36,11 +37,11 @@ pins_path <- "https://raw.githubusercontent.com/threndash/globtalent-map/main/pi
 
 gb_file <- "geoBoundariesCGAZ_ADM0.geojson"
 url <- paste0("https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/",gb_file)
-# download.file(url,gb_file)
+download.file(url,gb_file)
 world_raw <- st_read(gb_file)
 world_valid <- st_make_valid(world_raw)
 world <- ms_simplify(world_raw, keep = 0.025, keep_shapes = TRUE)
-# unlink(gb_file)
+unlink(gb_file)
 
 world_centroids <- st_centroid(world_valid)
 centroid_coords <- st_coordinates(world_centroids)
@@ -68,13 +69,17 @@ dt$country[dt$country=="Salvador"] <- "El Salvador"
 dt$country[dt$country=="Serbia"] <- "Republic of Serbia"
 dt$country[dt$country=="Tanzania"] <- "United Republic of Tanzania"
 
+dt$program_name <- revalue(dt$program,c("STAR"="GTF STARs",
+                                        "EXCL"="GTF Coaches",
+                                        "NATIONS"="GTF Olympiad Grants",
+                                        "BIG"="GTF BIG Talent Scholars"))
 dt <- unique(dt)
 dt <- data.table(dt)
 dt <- dt[,id := NULL]
-dt <- dt[,n_programs:=length(unique(program)),by="country"]
-dt <- dt[,all_programs:=paste(sort(unique(program)),collapse = ", "),by="country"]
-dt <- dt[order(dt$country,dt$program),]
-dt <- dt[,ord_program:=seq_len(length(unique(program))),by="country"]
+dt <- dt[,n_programs:=length(unique(program_name)),by="country"]
+dt <- dt[,all_programs:=paste(sort(unique(program_name)),collapse = ", "),by="country"]
+dt <- dt[order(dt$country,dt$program_name),]
+dt <- dt[,ord_program:=seq_len(length(unique(program_name))),by="country"]
 
 dt$ang <- 0
 dt$ang[dt$n_programs==2 & dt$ord_program==1] <- 320
@@ -139,38 +144,38 @@ mytext_markers <- paste(
 legend_html <- "
 <div style='display: flex; align-items: center;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/star.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>STAR</span>
+    <span style='margin-left: 5px;'>GTF STARs</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/nations.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>NATIONS</span>
+    <span style='margin-left: 5px;'>GTF Olympiad Grants</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/big.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>BIG</span>
+    <span style='margin-left: 5px;'>GTF BIG Talent Scholars</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/excl.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>EXCL</span>
+    <span style='margin-left: 5px;'>GTF Coaches</span>
 </div>
 "
 
 legend_html <- paste0("
 <div style='display: flex; align-items: center;'>
     <img src='",pins_path,"star.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>STAR</span>
+    <span style='margin-left: 5px;'>GTF STARs</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='",pins_path,"nations.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>NATIONS</span>
+    <span style='margin-left: 5px;'>GTF Olympiad Grants</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='",pins_path,"big.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>BIG</span>
+    <span style='margin-left: 5px;'>GTF BIG Talent Scholars</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='",pins_path,"excl.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>EXCL</span>
+    <span style='margin-left: 5px;'>GTF Coaches</span>
 </div>
 ")
 
