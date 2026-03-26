@@ -69,7 +69,7 @@ dt$country[dt$country=="Salvador"] <- "El Salvador"
 dt$country[dt$country=="Serbia"] <- "Republic of Serbia"
 dt$country[dt$country=="Tanzania"] <- "United Republic of Tanzania"
 
-dt$program_name <- revalue(dt$program,c("STAR"="GTF STARs",
+dt$program_name <- revalue(dt$program,c("STAR"="GTF STAR",
                                         "EXCL"="GTF Coaches",
                                         "NATIONS"="GTF Olympiad Grants",
                                         "BIG"="GTF BIG Talent Scholars"))
@@ -144,7 +144,7 @@ mytext_markers <- paste(
 legend_html <- "
 <div style='display: flex; align-items: center;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/star.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>GTF STARs</span>
+    <span style='margin-left: 5px;'>GTF STAR</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='https://raw.githubusercontent.com/threndash/logo/master/nations.svg' width='10px' height='13.3px'>
@@ -163,7 +163,7 @@ legend_html <- "
 legend_html <- paste0("
 <div style='display: flex; align-items: center;'>
     <img src='",pins_path,"star.svg' width='10px' height='13.3px'>
-    <span style='margin-left: 5px;'>GTF STARs</span>
+    <span style='margin-left: 5px;'>GTF STAR</span>
 </div>
 <div style='display: flex; align-items: center; margin-top: 5px;'>
     <img src='",pins_path,"nations.svg' width='10px' height='13.3px'>
